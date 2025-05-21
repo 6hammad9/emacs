@@ -1,0 +1,51 @@
+.live-stream-page {
+    padding: 2rem;
+  }
+  
+  .camera-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1rem;
+  }
+  
+  .camera-card {
+    border: 1px solid #ccc;
+    padding: 1rem;
+    border-radius: 8px;
+    background: #f9f9f9;
+  }
+  
+  .camera-card h3 {
+    margin-bottom: 1rem;
+  }
+  
+  .camera-card video {
+    max-width: 100%;.live-stream-page {
+        padding: 2rem;
+      }
+      
+      .camera-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1rem;
+      }
+      
+      .camera-card {
+        border: 1px solid #ccc;
+        padding: 1rem;
+        border-radius: 8px;
+        background: #f9f9f9;
+      }
+      
+      .camera-card h3 {
+        margin-bottom: 1rem;
+      }
+      
+      .camera-card video {
+        max-width: 100%;
+        height: auto;
+        border-radius: 8px;
+      }
+    height: auto;
+    border-radius: 8px;
+  }

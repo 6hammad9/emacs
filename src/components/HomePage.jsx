@@ -1,49 +1,78 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import '../styles/HomePage.css'
+import '../styles/HomePage.css';
+import DashboardCard from '../components/homepage/DashboardCard';
+import DetailsPopup from '../components/homepage/DetailsPopup';
+import { fetchAllCounts, fetchDetails } from '../services/cameraApi';
+import NavBar from '../components/NavBar'; // Import NavBar component
+
 const HomePage = () => {
-  const [totalCameras, setTotalCameras] = useState(0);
-  const navigate = useNavigate();  // For navigating to login page if not authenticated
+  const navigate = useNavigate();
+  const [counts, setCounts] = useState({
+    cameras: 0,
+    whitelisted: 0,
+    nonWhitelisted: 0,
+    unclearPictures: 0
+  });
+  const [selectedData, setSelectedData] = useState([]);
+  const [showPopup, setShowPopup] = useState(false);
+  const [popupTitle, setPopupTitle] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   useEffect(() => {
-    // Check if token exists
-    const token = localStorage.getItem('token');
-    if (!token) {
-      navigate('/login');  // Redirect to login page if not logged in
-    } else {
-      fetchCameraData();  // Fetch camera data if authenticated
-    }
-  }, [navigate]);
-
-  // Fetch camera count from the database
-  const fetchCameraData = async () => {
-    try {
-      const response = await axios.get('/api/cameras/count', {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,  // Include token in header
+    const loadCounts = async () => {
+      try {
+        const data = await fetchAllCounts();
+        if (data) {
+          setCounts(data);
         }
-      });
-      setTotalCameras(response.data.count);  // Assuming the API returns { count: number }
-    } catch (error) {
-      console.error('Error fetching camera data:', error);
+      } catch (err) {
+        console.error("Error fetching counts:", err);
+        setError("Failed to fetch counts.");
+      }
+    };
+
+    loadCounts();
+  }, []); // Empty dependency array to run only once on mount
+
+  const handleCardClick = async (type) => {
+    setLoading(true);
+    setError('');
+    setSelectedData([]); // Reset selected data before fetching
+
+    try {
+      const data = await fetchDetails(type);
+      setSelectedData(data || []); // Ensure `selectedData` is always an array
+      setPopupTitle(
+        type === 'nonwhitelisted' ? 'Non-Whitelisted' :
+        type === 'unclear' ? 'Unclear Pictures' :
+        type.charAt(0).toUpperCase() + type.slice(1)
+      );
+      setShowPopup(true);
+    } catch (err) {
+      console.error("Error fetching details:", err);
+      setError('Failed to load details. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className="home-page">
-      <div className="camera-card">
-        <div className="card">
-          <div className="card-content">
-            <div className="card-body">
-              <h5>Cameras</h5>
-              <div className="camera-count">
-                <p>Total Cameras: {totalCameras}</p>
-              </div>
-            </div>
-          </div>
-        </div>
+      <NavBar /> {/* Add the NavBar component here */}
+      
+      <div className="dashboard-container">
+        <DashboardCard title="Cameras" count={counts.cameras} onClick={() => handleCardClick('cameras')} color="#e3f2fd" />
+        <DashboardCard title="Whitelisted" count={counts.whitelisted} onClick={() => handleCardClick('whitelisted')} color="#e8f5e9" />
+        <DashboardCard title="Non-Whitelisted" count={counts.nonWhitelisted} onClick={() => handleCardClick('nonwhitelisted')} color="#ffebee" />
+        <DashboardCard title="Unclear Pictures" count={counts.unclearPictures} onClick={() => handleCardClick('unclear')} color="#fff3e0" />
       </div>
+
+      {error && <p style={{ color: 'red', textAlign: 'center' }}>{error}</p>}
+      {loading && <p style={{ textAlign: 'center' }}>Loading...</p>}
+
+      {showPopup && <DetailsPopup data={selectedData} onClose={() => setShowPopup(false)} title={popupTitle} />}
     </div>
   );
 };

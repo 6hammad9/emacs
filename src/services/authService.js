@@ -1,14 +1,4 @@
-// Utility function to retrieve the token from localStorage
-const getAuthToken = () => {
-  return localStorage.getItem('authToken');
-};
-
-// Utility function to remove the token (e.g., during logout)
-const removeAuthToken = () => {
-  localStorage.removeItem('authToken');
-};
-
-// Login function with JWT handling
+// // Login function without JWT handling
 export const login = async (username, password) => {
   try {
     const response = await fetch('http://localhost:3000/api/users/login', {
@@ -18,22 +8,16 @@ export const login = async (username, password) => {
       },
       body: JSON.stringify({ username, password }),
     });
-    
+
     console.log('Response status:', response.status);
     const data = await response.json();
-    console.log('Response data:', data);  // Log the response body for further inspection
-    
+    console.log('Response data:', data); // Log the response body for further inspection
+
     if (!response.ok) {
       throw new Error(data.message || 'Failed to login');
     }
 
-    // If a token is returned, store it (this is just an example with localStorage)
-    if (data.token) {
-      localStorage.setItem('authToken', data.token); // Store token in localStorage
-    }
-
-    return data; // Return the data (e.g., token, message, or user info)
-
+    return data; // Return the data (e.g., message or user info)
   } catch (error) {
     console.error('Login error:', error.message);
     throw new Error(error.message); // Rethrow the error so it can be handled in the component
@@ -62,32 +46,15 @@ export const registerUser = async (user) => {
   }
 };
 
-// Utility function to check if the user is logged in by checking the token
-export const isAuthenticated = () => {
-  const token = getAuthToken();
-  return !!token; // Return true if token exists, false otherwise
-};
-
 // Utility function to handle logout
 export const logout = () => {
-  removeAuthToken(); // Remove token from localStorage on logout
+  // No token to remove, but you can add other cleanup logic here if needed
+  console.log('User logged out.');
 };
 
-// Function to make authenticated requests using JWT
-export const authenticatedFetch = async (url, options = {}) => {
-  const token = getAuthToken();
-  
-  if (!token) {
-    throw new Error('No authentication token found.');
-  }
-
-  const response = await fetch(url, {
-    ...options,
-    headers: {
-      ...options.headers,
-      Authorization: `Bearer ${token}`, // Add Authorization header with the token
-    },
-  });
+// Function to make regular fetch requests (without JWT authentication)
+export const fetchData = async (url, options = {}) => {
+  const response = await fetch(url, options);
 
   if (!response.ok) {
     const errorBody = await response.json();

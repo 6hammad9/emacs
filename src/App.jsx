@@ -1,49 +1,28 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { Routes, Route, Navigate } from "react-router-dom";
 import "./styles/login.css";
-import LoginForm from "./components/Login";
-import RegisterForm from "./components/RegisterForm";
 import HomePage from "./components/HomePage";
-import { login } from "./services/authService";
+import Gallery from "./components/Gallery.jsx";
+import CameraInfo from "./components/CameraInfo.jsx";
+import NotWhitelisted from "./components/NotWhitelisted.jsx";
+import LiveStreamPage from "./components/LiveStreamPage.jsx";
+import RegisterPerson from "./components/RegisterPerson";
 
 function App() {
   const [message, setMessage] = useState("");
-  const [loggedIn, setLoggedIn] = useState(false);
-
-  useEffect(() => {
-    // Check if user is already logged in (from localStorage)
-    const storedLoginStatus = localStorage.getItem("loggedIn");
-    if (storedLoginStatus === "true") {
-      setLoggedIn(true);
-    }
-  }, []);
-
-  const handleLogin = async (username, password) => {
-    try {
-      const data = await login(username, password);
-      setMessage(data.message);
-      setLoggedIn(true);
-      localStorage.setItem("loggedIn", "true"); // Store login status
-    } catch (error) {
-      setMessage("Login failed. Please check your credentials.");
-    }
-  };
-
-  const handleLogout = () => {
-    setLoggedIn(false);
-    localStorage.removeItem("loggedIn"); // Clear login status
-  };
 
   return (
     <div className="App">
-      {loggedIn ? (
-        <HomePage onLogout={handleLogout} /> // Pass logout function
-      ) : (
-        <>
-          <LoginForm onSubmit={handleLogin} />
-          {message && <p className="error-message">{message}</p>}
-          <RegisterForm />
-        </>
-      )}
+      <Routes>
+        <Route path="/dashboard" element={<HomePage />} />
+        <Route path="/Registerperson" element={<RegisterPerson />} />
+        <Route path="/Gallery" element={<Gallery />} />
+        <Route path="/NotWhitelisted" element={<NotWhitelisted />} />
+        <Route path="/CameraInfo" element={<CameraInfo />} />
+        <Route path="/multistream" element={<div>Multistream Page</div>} />
+        <Route path="/LiveStreamPage" element={<LiveStreamPage />} />
+        <Route path="*" element={<Navigate to="/dashboard" />} /> {/* Redirect to dashboard for unknown routes */}
+      </Routes>
     </div>
   );
 }

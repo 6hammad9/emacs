@@ -1,0 +1,23 @@
+.gallery {
+    padding: 2rem;
+    text-align: center;
+  }
+  
+  .image-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+  }
+  
+  .image-card {
+    border: 1px solid #ccc;
+    padding: 1rem;
+    border-radius: 8px;
+    background: #f9f9f9;
+  }
+  
+  .image-card img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+  }
